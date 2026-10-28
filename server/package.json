@@ -3,6 +3,20 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {"dev":"node --watch src/app.js","start":"node src/app.js","test":"node --test","seed":"node scripts/seed.js","admin:set":"node scripts/set-admin.js"},
-  "dependencies": {"cors":"^2.8.5","dotenv":"^16.5.0","express":"^5.1.0","express-rate-limit":"^7.5.0","firebase-admin":"^14.5.0","helmet":"^8.1.0","zod":"^3.24.2"}
+  "scripts": {
+    "dev": "node --watch src/app.js",
+    "start": "node src/app.js",
+    "test": "node --test",
+    "seed": "node scripts/seed.js",
+    "admin:set": "node scripts/set-admin.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "zod": "4.6.7"
+  }
 }

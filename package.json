@@ -11,8 +11,5 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
-  },
-  "overrides": {
-    "@grpc/grpc-js": "^1.14.6"
   }
 }

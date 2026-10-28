@@ -3,18 +3,21 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {"dev":"vite --host 0.0.0.0","build":"vite build","preview":"vite preview --host 0.0.0.0"},
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
   "dependencies": {
-    "@grpc/grpc-js": "^1.14.6",
-    "@hookform/resolvers": "^3.10.0",
-    "firebase": "^13.0.0",
+    "@hookform/resolvers": "6.0.1",
+    "@supabase/supabase-js": "2.118.0",
     "framer-motion": "^12.7.4",
     "lucide-react": "^0.487.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.55.0",
     "react-router-dom": "^7.5.0",
-    "zod": "^3.24.2"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.1",

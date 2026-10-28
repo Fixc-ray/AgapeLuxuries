@@ -2,19 +2,26 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Menu, Search, ShoppingBag, UserRound, X, Instagram, ArrowRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { api } from '../services/api';
 
 const links = [['Men','/men'],['Women','/women'],['Fragrances','/fragrances'],['Beauty','/beauty'],['Jewellery','/jewellery'],['Gifts','/gifts'],['New arrivals','/new-arrivals']];
+const storedId=(storage,key)=>{let value=storage.getItem(key);if(!value){value=crypto.randomUUID();storage.setItem(key,value)}return value};
 
 export default function Layout() {
   const { cartCount, wishlist } = useShop();
   const [menu,setMenu]=useState(false); const [search,setSearch]=useState(false); const [term,setTerm]=useState('');
   const location=useLocation(); const navigate=useNavigate();
   useEffect(()=>{setMenu(false);setSearch(false);window.scrollTo(0,0)},[location.pathname]);
+  useEffect(()=>{
+    if(navigator.doNotTrack==='1')return undefined;
+    const send=()=>{let referrerHost=null;try{referrerHost=document.referrer?new URL(document.referrer).hostname:null}catch{/* Ignore malformed referrers. */}api.trackVisit({visitorId:storedId(localStorage,'agape_visitor_v1'),sessionId:storedId(sessionStorage,'agape_session_v1'),path:location.pathname,referrerHost}).catch(()=>{})};
+    if('requestIdleCallback' in window){const id=window.requestIdleCallback(send,{timeout:1800});return()=>window.cancelIdleCallback(id)}
+    const id=window.setTimeout(send,500);return()=>window.clearTimeout(id);
+  },[location.pathname]);
   const submit=e=>{e.preventDefault(); if(term.trim()) navigate(`/search?q=${encodeURIComponent(term.trim())}`)};
   return <div className="min-h-screen bg-ivory text-ink">
     <a href="#content" className="skip-link">Skip to content</a>
-    <div className="bg-ink px-4 py-2 text-center text-[11px] uppercase tracking-[.22em] text-ivory">Complimentary Nairobi delivery on orders over KSh 15,000</div>
-    <header className="sticky top-0 z-40 border-b border-black/10 bg-ivory/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-black/10 bg-ivory/90 shadow-[0_8px_30px_rgba(24,23,19,.04)] backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-[1480px] items-center justify-between px-5 lg:px-10">
         <button onClick={()=>setMenu(true)} className="icon-btn lg:hidden" aria-label="Open menu"><Menu size={20}/></button>
         <Link to="/" className="logo" aria-label="Agape Luxuries home"><span>AGAPE</span><small>LUXURIES</small></Link>
@@ -42,7 +49,7 @@ export default function Layout() {
 }
 
 export function Newsletter() {
-  const [email,setEmail]=useState(''); const [done,setDone]=useState(false);
-  const submit=e=>{e.preventDefault();if(email){setDone(true);setEmail('')}};
-  return <section className="bg-sand px-6 py-20 text-center"><p className="eyebrow">Private list</p><h2 className="section-title mx-auto max-w-2xl">A more considered inbox.</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-black/60">New edits, private offers and thoughtful gifting inspiration — sent sparingly.</p>{done?<p className="mt-7 text-sm">Welcome to the private list.</p>:<form onSubmit={submit} className="mx-auto mt-8 flex max-w-lg border-b border-black/40"><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-transparent py-4 outline-none" placeholder="Email address"/><button aria-label="Subscribe"><ArrowRight/></button></form>}</section>
+  const [email,setEmail]=useState(''); const [state,setState]=useState('idle');
+  const submit=async e=>{e.preventDefault();if(!email)return;setState('loading');try{await api.newsletter(email);setEmail('');setState('done')}catch{setState('error')}};
+  return <section className="newsletter-panel px-6 py-24 text-center"><p className="eyebrow text-gold">Private list</p><h2 className="section-title mx-auto max-w-2xl">A more considered inbox.</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-black/60">New edits, private offers and thoughtful gifting inspiration — sent sparingly.</p>{state==='done'?<p className="mt-7 text-sm">Welcome to the private list.</p>:<form onSubmit={submit} className="mx-auto mt-8 flex max-w-lg border-b border-black/40"><label className="sr-only" htmlFor="newsletter-email">Email address</label><input id="newsletter-email" type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-transparent py-4 outline-none" placeholder="Email address"/><button disabled={state==='loading'} aria-label="Subscribe"><ArrowRight/></button></form>}{state==='error'?<p className="mt-4 text-sm text-red-700">We could not subscribe you just now. Please try again.</p>:null}</section>
 }
